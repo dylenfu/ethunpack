@@ -78,6 +78,17 @@ func (arguments Arguments) NonIndexed() Arguments {
 	return ret
 }
 
+// Indexed returns the indexed arguments
+func (arguments Arguments) Indexed() Arguments {
+	var ret []Argument
+	for _, arg := range arguments {
+		if arg.Indexed {
+			ret = append(ret, arg)
+		}
+	}
+	return ret
+}
+
 // isTuple returns true for non-atomic constructs, like (uint,uint) or uint[]
 func (arguments Arguments) isTuple() bool {
 	return len(arguments) > 1
@@ -167,6 +178,17 @@ func (arguments Arguments) unpackAtomic(v interface{}, marshalledValues []interf
 	elem := reflect.ValueOf(v).Elem()
 	reflectValue := reflect.ValueOf(marshalledValues[0])
 	return set(elem, reflectValue, arguments.NonIndexed()[0])
+}
+
+func (arguments Arguments) unpackTopics(v interface{}, decodeValues [][]byte) error {
+	elem := reflect.ValueOf(v).Elem()
+	for k, _ := range arguments.Indexed() {
+		reflectValue := reflect.ValueOf(decodeValues[k])
+		if err := set(elem, reflectValue, arguments.Indexed()[k]); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Computes the full size of an array;
