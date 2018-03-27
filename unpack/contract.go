@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/dylenfu/ethunpack/types"
+	"github.com/dylenfu/extractor/types"
 	"errors"
 )
 

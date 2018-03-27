@@ -3,7 +3,7 @@ package unpack_test
 import (
 	"testing"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	. "github.com/dylenfu/ethunpack/unpack"
+	. "github.com/dylenfu/extractor/unpack"
 )
 
 func Test_UnpackSubmitRing(t *testing.T) {
