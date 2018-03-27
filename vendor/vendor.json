@@ -1,0 +1,62 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "gZQ6HheWahvZzIc3phBnOwoWHjE=",
+			"origin": "github.com/ethereum/go-ethereum/vendor/github.com/btcsuite/btcd/btcec",
+			"path": "github.com/btcsuite/btcd/btcec",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "OKSef0QZSaPCm5tFV0fj/MuEbdk=",
+			"path": "github.com/ethereum/go-ethereum/accounts/abi",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "UyE/zzupdUo8ZK7w8d8In++s7SQ=",
+			"path": "github.com/ethereum/go-ethereum/common",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "tMtGtURWx29lWZYsLtLOQaPvGqs=",
+			"path": "github.com/ethereum/go-ethereum/common/hexutil",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "Hd1Y5DkzYULQzJlSgYv2w5SiEAo=",
+			"path": "github.com/ethereum/go-ethereum/common/math",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "PSx8ACgC3L7WzkPZfHJkukAuMEs=",
+			"path": "github.com/ethereum/go-ethereum/crypto",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "LS/Qn4CAVXw3zDAiURIS9LIvKxg=",
+			"path": "github.com/ethereum/go-ethereum/crypto/secp256k1",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "pQzUVRi0z/3Z4FpRyExSg1ROLSA=",
+			"path": "github.com/ethereum/go-ethereum/crypto/sha3",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		},
+		{
+			"checksumSHA1": "f2Asra5yXCMDxwx/TF6m4h3ZqOw=",
+			"path": "github.com/ethereum/go-ethereum/rlp",
+			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
+			"revisionTime": "2018-03-13T12:35:18Z"
+		}
+	],
+	"rootPath": "github.com/dylenfu/ethunpack"
+}
