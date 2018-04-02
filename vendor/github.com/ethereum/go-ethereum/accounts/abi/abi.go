@@ -74,7 +74,7 @@ func (abi ABI) Pack(name string, args ...interface{}) ([]byte, error) {
 }
 
 // Unpack output in v according to the abi specification
-func (abi ABI) Unpack(v interface{}, name string, output []byte, topics [][]byte) (err error) {
+func (abi ABI) Unpack(v interface{}, name string, output []byte, decodeValues [][]byte) (err error) {
 	if len(output) == 0 {
 		return fmt.Errorf("abi: unmarshalling empty output")
 	}
@@ -86,19 +86,12 @@ func (abi ABI) Unpack(v interface{}, name string, output []byte, topics [][]byte
 		}
 		return method.Inputs.Unpack(v, output)
 	} else if event, ok := abi.Events[name]; ok {
-		if err := abi.formatIndexed(v, event, topics); err != nil {
+		if err := event.Inputs.unpackTopics(v, decodeValues); err != nil {
 			return fmt.Errorf("abi: format event indexed fields failed %s", err.Error())
 		}
 		return event.Inputs.Unpack(v, output)
 	}
 	return fmt.Errorf("abi: could not locate named method or event")
-}
-
-func (abi ABI) formatIndexed(v interface{}, event Event, decodeValues [][]byte) (err error) {
-	if len(decodeValues) == 0 {
-		return nil
-	}
-	return event.Inputs.unpackTopics(v, decodeValues)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface

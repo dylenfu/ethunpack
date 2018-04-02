@@ -78,17 +78,6 @@ func (arguments Arguments) NonIndexed() Arguments {
 	return ret
 }
 
-// Indexed returns the indexed arguments
-func (arguments Arguments) Indexed() Arguments {
-	var ret []Argument
-	for _, arg := range arguments {
-		if arg.Indexed {
-			ret = append(ret, arg)
-		}
-	}
-	return ret
-}
-
 // isTuple returns true for non-atomic constructs, like (uint,uint) or uint[]
 func (arguments Arguments) isTuple() bool {
 	return len(arguments) > 1
@@ -180,14 +169,21 @@ func (arguments Arguments) unpackAtomic(v interface{}, marshalledValues []interf
 	return set(elem, reflectValue, arguments.NonIndexed()[0])
 }
 
-func (arguments Arguments) unpackTopics(v interface{}, decodeValues [][]byte) error {
+func (arguments Arguments) unpackTopics(v interface{}, decodedValues [][]byte) error {
 	elem := reflect.ValueOf(v).Elem()
-	for k, _ := range arguments.Indexed() {
-		reflectValue := reflect.ValueOf(decodeValues[k])
-		if err := set(elem, reflectValue, arguments.Indexed()[k]); err != nil {
-			return err
+	i := 0
+	for k, arg := range arguments {
+		if arg.Indexed {
+			marshalledValue, err := toGoType(0, arg.Type, decodedValues[i])
+			if err != nil {
+				return err
+			}
+			i++
+			reflectValue := reflect.ValueOf(marshalledValue)
+			elem.Field(k).Set(reflectValue)
 		}
 	}
+
 	return nil
 }
 
