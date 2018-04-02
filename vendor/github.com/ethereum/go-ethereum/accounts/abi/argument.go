@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"strconv"
 )
 
 // Argument holds the name of the argument and the corresponding type.
@@ -128,16 +129,21 @@ func (arguments Arguments) unpackTuple(v interface{}, marshalledValues []interfa
 	for i, arg := range arguments.NonIndexed() {
 
 		reflectValue := reflect.ValueOf(marshalledValues[i])
+		indexCnt := 0
 
 		switch kind {
 		case reflect.Struct:
-			name := capitalise(arg.Name)
+			// name := capitalise(arg.Name)
 			for j := 0; j < typ.NumField(); j++ {
-				// TODO read tags: `abi:"fieldName"`
-				if typ.Field(j).Name == name {
+				if arguments[j].Indexed {
+					indexCnt++
+				}
+				fieldIdStr := typ.Field(j).Tag.Get("fieldId")
+				if fieldId, _ := strconv.Atoi(fieldIdStr); fieldId == indexCnt + i {
 					if err := set(value.Field(j), reflectValue, arg); err != nil {
 						return err
 					}
+					break
 				}
 			}
 		case reflect.Slice, reflect.Array:
