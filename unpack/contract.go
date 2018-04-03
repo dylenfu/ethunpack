@@ -3,8 +3,8 @@ package unpack
 import (
 	"errors"
 	"fmt"
+	"github.com/dylenfu/extractor/abi"
 	"github.com/dylenfu/extractor/types"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"log"
 	"math/big"

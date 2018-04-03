@@ -74,7 +74,7 @@ func (abi ABI) Pack(name string, args ...interface{}) ([]byte, error) {
 }
 
 // Unpack output in v according to the abi specification
-func (abi ABI) Unpack(v interface{}, name string, output []byte, decodeValues [][]byte) (err error) {
+func (abi ABI) Unpack(v interface{}, name string, output []byte, decodeTopicValues [][]byte) (err error) {
 	if len(output) == 0 {
 		return fmt.Errorf("abi: unmarshalling empty output")
 	}
@@ -86,7 +86,7 @@ func (abi ABI) Unpack(v interface{}, name string, output []byte, decodeValues []
 		}
 		return method.Inputs.Unpack(v, output)
 	} else if event, ok := abi.Events[name]; ok {
-		if err := event.Inputs.unpackTopics(v, decodeValues); err != nil {
+		if err := event.Inputs.unpackTopics(v, decodeTopicValues); err != nil {
 			return fmt.Errorf("abi: format event indexed fields failed %s", err.Error())
 		}
 		return event.Inputs.Unpack(v, output)

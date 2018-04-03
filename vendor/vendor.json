@@ -10,12 +10,6 @@
 			"revisionTime": "2018-03-13T12:35:18Z"
 		},
 		{
-			"checksumSHA1": "OKSef0QZSaPCm5tFV0fj/MuEbdk=",
-			"path": "github.com/ethereum/go-ethereum/accounts/abi",
-			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",
-			"revisionTime": "2018-03-13T12:35:18Z"
-		},
-		{
 			"checksumSHA1": "UyE/zzupdUo8ZK7w8d8In++s7SQ=",
 			"path": "github.com/ethereum/go-ethereum/common",
 			"revision": "62bc179bb964e8852ff33f8fcebc916bbf938424",

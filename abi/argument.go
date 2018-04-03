@@ -20,8 +20,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // Argument holds the name of the argument and the corresponding type.
@@ -147,7 +147,7 @@ func (arguments Arguments) unpackTuple(v interface{}, marshalledValues []interfa
 					indexCnt++
 				}
 				fieldIdStr := typ.Field(j).Tag.Get("fieldId")
-				if fieldId, _ := strconv.Atoi(fieldIdStr); fieldId == indexCnt + i {
+				if fieldId, _ := strconv.Atoi(fieldIdStr); fieldId == indexCnt+i {
 					if err := set(value.Field(j), reflectValue, arg); err != nil {
 						return err
 					}
