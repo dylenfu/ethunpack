@@ -103,9 +103,6 @@ func (arguments Arguments) Unpack(v interface{}, data []byte) error {
 	if arguments.isTuple() {
 		return arguments.unpackTuple(v, marshalledValues)
 	}
-	if arguments.isEmpty() {
-		return arguments.unpackEmpty(v, marshalledValues)
-	}
 	return arguments.unpackAtomic(v, marshalledValues)
 }
 
@@ -175,17 +172,33 @@ func (arguments Arguments) unpackTuple(v interface{}, marshalledValues []interfa
 
 // unpackAtomic unpacks ( hexdata -> go ) a single value
 func (arguments Arguments) unpackAtomic(v interface{}, marshalledValues []interface{}) error {
-	if len(marshalledValues) != 1 {
-		return fmt.Errorf("abi: wrong length, expected single value, got %d", len(marshalledValues))
-	}
 	elem := reflect.ValueOf(v).Elem()
+	if len(marshalledValues) != 1 {
+		return fmt.Errorf("abi: wrong length, atomic unpacking data expected single value, got %d", len(marshalledValues))
+	}
+	if elem.NumField() != 1 {
+		return fmt.Errorf("abi: wrong length, atomic unpacking struct expected single field, got %d", elem.NumField())
+	}
+
 	reflectValue := reflect.ValueOf(marshalledValues[0])
-	return set(elem, reflectValue, arguments.NonIndexed()[0])
+	return set(elem.Field(0), reflectValue, arguments.NonIndexed()[0])
 }
 
 // unpackEmpty
-func (arguments Arguments) unpackEmpty() {
+func unpackEmpty(v interface{}, decodedBytes [][]byte) error {
+	elem := reflect.ValueOf(v).Elem()
+	if elem.NumField() != 1 {
+		return fmt.Errorf("abi: wrong length, method unpacking struct expected single field, got %d", elem.NumField())
+	}
+	if len(decodedBytes) != 1 {
+		return fmt.Errorf("abi: wrong length, method unpacking data expected single value, got %d", len(decodedBytes))
+	}
 
+	marshalledValue := readInteger(elem.Field(0).Kind(), decodedBytes[0])
+	reflectValue := reflect.ValueOf(marshalledValue)
+	elem.Field(0).Set(reflectValue)
+
+	return nil
 }
 
 // unpackTopics

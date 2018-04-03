@@ -1,4 +1,4 @@
-package unpack
+package unpack_test
 
 import (
 	. "github.com/dylenfu/extractor/unpack"
@@ -80,6 +80,19 @@ func Test_UnpackSubmitRing(t *testing.T) {
 	t.Log("feeSelection", ring.FeeSelections)
 }
 
+func Test_UnpackDepositMethod(t *testing.T) {
+	input := "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+	deposit := &WethDepositMethod{}
+
+	data := hexutil.MustDecode("0x" + input[10:])
+	if err := WethAbi.Unpack(deposit, "deposit", []byte{}, [][]byte{data}); err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	evt := deposit.ConvertDown()
+	t.Logf("deposit method value:%s", evt.Value.String())
+}
+
 func Test_UnpackWithdrawalMethod(t *testing.T) {
 	input := "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000064"
 
@@ -91,22 +104,16 @@ func Test_UnpackWithdrawalMethod(t *testing.T) {
 	}
 
 	evt := withdrawal.ConvertDown()
-	t.Logf("withdrawal event value:%s", evt.Value)
+	t.Logf("withdrawal method value:%s", evt.Value.String())
 }
 
-/*
-func TestExtractorServiceImpl_UnpackCancelOrderMethod(t *testing.T) {
-	input := "0x47a99e43000000000000000000000000b1018949b241d76a1ab2094f473e9befeabb5ead000000000000000000000000529540ee6862158f47d647ae023098f6705210a9000000000000000000000000667b8a1021c324b4f42e77d46f5a7a2a2a3cdfc60000000000000000000000000000000000000000000000000000000000004e2000000000000000000000000000000000000000000000000000000000000003e8000000000000000000000000000000000000000000000000000000005a33d324000000000000000000000000000000000000000000000000000000000083d60000000000000000000000000000000000000000000000000000000000000003e80000000000000000000000000000000000000000000000000000000000002710000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c8c2ccb736eb22424dee71115565d46a1fcf91beb1b12a59488de2757254051020a9d5b0698742580b4a7ec2090e1f24b8b466be253e162994e4887720446807c"
+func Test_UnpackCancelOrderMethod(t *testing.T) {
+	input := "0x8bc12fd1000000000000000000000000a44282db26ec80c6cfdd748ec09f386a64d645bd000000000000000000000000639687b7f8501f174356d3acb1972f749021ccd0000000000000000000000000fe5afa7bff3394359af2d277acc9f00065cdbe2f000000000000000000000000e62d15a9345b3c00f637fbf4dd08d532101c452b0000000000000000000000000000000000000000000000000c06e364b5b2600000000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000005abf27bd000000000000000000000000000000000000000000000000000000005ae6b4bd00000000000000000000000000000000000000000000000018904d9f44710000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000032000000000000000000000000000000000000000000000000000000000000001c6a5a787d7772a16738a554a2f99ed4ae15de26118401f503649df7192f7361c7245be1280754d2331ab210081998cb6be95fdf23330cc1eab1eb7ec88e64293b"
 
-	var method ethaccessor.CancelOrderMethod
-
+	method := &CancelOrderMethod{}
 	data := hexutil.MustDecode("0x" + input[10:])
 
-	for i := 0; i < len(data)/32; i++ {
-		t.Logf("index:%d -> %s", i, common.ToHex(data[i*32:(i+1)*32]))
-	}
-
-	if err := ethaccessor.ProtocolImplAbi().UnpackMethodInput(&method, "cancelOrder", data); err != nil {
+	if err := ImplAbi.Unpack(method, "cancelOrder", data, [][]byte{}); err != nil {
 		t.Fatalf(err.Error())
 	}
 
@@ -132,17 +139,30 @@ func TestExtractorServiceImpl_UnpackCancelOrderMethod(t *testing.T) {
 	t.Log("cancelAmount", cancelAmount)
 }
 
-func TestExtractorServiceImpl_UnpackApproveMethod(t *testing.T) {
-	input := "0x095ea7b300000000000000000000000045aa504eb94077eec4bf95a10095a8e3196fc5910000000000000000000000000000000000000000000000008ac7230489e80000"
+func Test_UnpackCancelOrderEvent(t *testing.T) {
+	input := "0x00000000000000000000000000000000000000000000003635c9adc5dea00000"
+	topic := "0xa9f927dbef0522016b9168807ce7840d3e09faa5520291a9b0eb6748b439a436"
 
-	var method ethaccessor.ApproveMethod
+	cancel := &OrderCancelledEvent{}
+	data := hexutil.MustDecode(input)
+	decodeValues := [][]byte{hexutil.MustDecode(topic)}
 
-	data := hexutil.MustDecode("0x" + input[10:])
-	for i := 0; i < len(data)/32; i++ {
-		t.Logf("index:%d -> %s", i, common.ToHex(data[i*32:(i+1)*32]))
+	if err := ImplAbi.Unpack(cancel, "OrderCancelled", data, decodeValues); err != nil {
+		t.Fatal(err.Error())
 	}
 
-	if err := ethaccessor.Erc20Abi().UnpackMethodInput(&method, "approve", data); err != nil {
+	evt := cancel.ConvertDown()
+
+	t.Logf("orderhash:%s", evt.OrderHash.Hex())
+	t.Logf("cancelledAmount:%s", evt.AmountCancelled.String())
+}
+
+func Test_UnpackApproveMethod(t *testing.T) {
+	input := "0x095ea7b30000000000000000000000004e9d4d3b7db4973c91b23a634eb9f675d0e19f790000000000000000000000000000000006f05b59d3b1ffffe43e9298b1380000"
+
+	method := &ApproveMethod{}
+	data := hexutil.MustDecode("0x" + input[10:])
+	if err := Erc20Abi.Unpack(method, "approve", data, [][]byte{}); err != nil {
 		t.Fatalf(err.Error())
 	}
 
@@ -150,88 +170,41 @@ func TestExtractorServiceImpl_UnpackApproveMethod(t *testing.T) {
 	t.Logf("approve spender:%s, value:%s", approve.Spender.Hex(), approve.Value.String())
 }
 
-func TestExtractorServiceImpl_UnpackTransfer(t *testing.T) {
-	inputs := []string{
-		"0x00000000000000000000000000000000000000000000001d2666491321fc5651",
-		"0x0000000000000000000000000000000000000000000000008ac7230489e80000",
-		"0x0000000000000000000000000000000000000000000000004c0303a413a39039",
-		"0x000000000000000000000000000000000000000000000000016345785d8a0000",
-	}
-	transfer := &ethaccessor.TransferEvent{}
+func Test_UnpackTransfer(t *testing.T) {
+	input := "0x0000000000000000000000000000000000000000000000001d012bed3c90ff00"
+	topic1 := "0x000000000000000000000000a44282db26ec80c6cfdd748ec09f386a64d645bd"
+	topic2 := "0x0000000000000000000000003a49f1f84234615caa46e9c89ad3c53e8f142b6c"
 
-	for _, input := range inputs {
-		data := hexutil.MustDecode(input)
-
-		if err := ethaccessor.Erc20Abi().Unpack(transfer, "Transfer", data, abi.SEL_UNPACK_EVENT); err != nil {
-			t.Fatalf(err.Error())
-		}
-
-		t.Logf("transfer value:%s", transfer.Value.String())
-	}
-}
-
-func TestExtractorServiceImpl_UnpackRingMined(t *testing.T) {
-	input := "0x0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000750ad4351bb728cec7d639a9511f9d6488f1e2590000000000000000000000003a49f1f84234615caa46e9c89ad3c53e8f142b6c00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000002d5f3eb4410b337628be5372c9c3fc790bcef4113fcb229c296bd2519c41aaed2400e5da365eb5b208ccccc5ca8ed27da8286fbb76139cda77b907234ebd09a93000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000ae56f730e6d840000000000000000000000000000000000000000000000000000286c39e79fdbc4f8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001532b10660c30647ae00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000286c39e79fdbc4f800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001158b4151fad157c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ae56f730e6d840000"
-	ringmined := &ethaccessor.RingMinedEvent{}
-
+	transfer := &TransferEvent{}
 	data := hexutil.MustDecode(input)
-
-	if err := ethaccessor.ProtocolImplAbi().Unpack(ringmined, "RingMined", data, abi.SEL_UNPACK_EVENT); err != nil {
+	decodedValues := [][]byte{hexutil.MustDecode(topic1), hexutil.MustDecode(topic2)}
+	if err := Erc20Abi.Unpack(transfer, "Transfer", data, decodedValues); err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	_, fills, err := ringmined.ConvertDown()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
-	for _, fill := range fills {
-		t.Logf("amountS:%s, amountB:%s", fill.AmountS.String(), fill.AmountB.String())
-	}
+	evt := transfer.ConvertDown()
+	t.Logf("transfer event value:%s sender:%s, receiver:%s", evt.Value.String(), evt.Sender.Hex(), evt.Receiver.Hex())
 }
 
-func TestExtractorServiceImpl_UnpackWethDeposit(t *testing.T) {
-	input := "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
-	deposit := &ethaccessor.WethDepositEvent{}
-
-	data := hexutil.MustDecode(input)
-
-	if err := ethaccessor.WethAbi().Unpack(deposit, "Deposit", data, abi.SEL_UNPACK_EVENT); err != nil {
-		t.Fatalf(err.Error())
-	} else {
-		t.Logf("deposit value:%s", deposit.Value.String())
-	}
-}
-
-func TestExtractorServiceImpl_UnpackTokenRegistry(t *testing.T) {
+func Test_UnpackTokenRegistry(t *testing.T) {
 	input := "0x000000000000000000000000f079e0612e869197c5f4c7d0a95df570b163232b0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000457455448"
 
-	tokenRegistry := &ethaccessor.TokenRegisteredEvent{}
-
+	tokenRegistry := &TokenRegisteredEvent{}
 	data := hexutil.MustDecode(input)
 
-	println("====token registry", len(data))
-
-	if err := ethaccessor.WethAbi().Unpack(tokenRegistry, "TokenRegistered", data, abi.SEL_UNPACK_EVENT); err != nil {
+	if err := TokenRegistryAbi.Unpack(tokenRegistry, "TokenRegistered", data, [][]byte{}); err != nil {
 		t.Fatalf(err.Error())
-	} else {
-		t.Logf("TokenRegistered symbol:%s, address:%s", tokenRegistry.Symbol, tokenRegistry.Token.Hex())
 	}
+	t.Logf("TokenRegistered symbol:%s, address:%s", tokenRegistry.Symbol, tokenRegistry.Token.Hex())
 }
 
-func TestExtractorServiceImpl_UnpackTokenUnRegistry(t *testing.T) {
+func Test_UnpackTokenUnRegistry(t *testing.T) {
 	input := "0x000000000000000000000000529540ee6862158f47d647ae023098f6705210a90000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000457455448"
 
-	tokenUnRegistry := &ethaccessor.TokenUnRegisteredEvent{}
-
+	tokenUnRegistry := &TokenUnRegisteredEvent{}
 	data := hexutil.MustDecode(input)
-
-	println("====token unregistry", len(data))
-
-	if err := ethaccessor.WethAbi().Unpack(tokenUnRegistry, "TokenUnregistered", data, abi.SEL_UNPACK_EVENT); err != nil {
+	if err := TokenRegistryAbi.Unpack(tokenUnRegistry, "TokenUnregistered", data, [][]byte{}); err != nil {
 		t.Fatalf(err.Error())
-	} else {
-		t.Logf("TokenUnregistered symbol:%s, address:%s", tokenUnRegistry.Symbol, tokenUnRegistry.Token.Hex())
 	}
+	t.Logf("TokenUnregistered symbol:%s, address:%s", tokenUnRegistry.Symbol, tokenUnRegistry.Token.Hex())
 }
-
-*/
