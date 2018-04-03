@@ -84,6 +84,11 @@ func (arguments Arguments) isTuple() bool {
 	return len(arguments) > 1
 }
 
+// isEmpty return true for non-input
+func (arguments Arguments) isEmpty() bool {
+	return len(arguments) == 0
+}
+
 // Unpack performs the operation hexdata -> Go format
 func (arguments Arguments) Unpack(v interface{}, data []byte) error {
 
@@ -97,6 +102,9 @@ func (arguments Arguments) Unpack(v interface{}, data []byte) error {
 	}
 	if arguments.isTuple() {
 		return arguments.unpackTuple(v, marshalledValues)
+	}
+	if arguments.isEmpty() {
+		return arguments.unpackEmpty(v, marshalledValues)
 	}
 	return arguments.unpackAtomic(v, marshalledValues)
 }
@@ -175,6 +183,12 @@ func (arguments Arguments) unpackAtomic(v interface{}, marshalledValues []interf
 	return set(elem, reflectValue, arguments.NonIndexed()[0])
 }
 
+// unpackEmpty
+func (arguments Arguments) unpackEmpty() {
+
+}
+
+// unpackTopics
 func (arguments Arguments) unpackTopics(v interface{}, decodedValues [][]byte) error {
 	elem := reflect.ValueOf(v).Elem()
 	i := 0
