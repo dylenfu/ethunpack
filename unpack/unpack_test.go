@@ -199,11 +199,18 @@ func Test_UnpackTokenRegistry(t *testing.T) {
 }
 
 func Test_UnpackTokenUnRegistry(t *testing.T) {
-	input := "0x000000000000000000000000529540ee6862158f47d647ae023098f6705210a90000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000457455448"
+	input := "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034c5243"
+	topics := []string{
+		"0xee98311a96660ce4ab10cd82053f767653901305ec8acf91ec60311de919e28a",
+		"0x000000000000000000000000ae79693db742d72576db8349142f9cd8b9d85355",
+	}
+	var decodeTopics [][]byte
+	decodeTopics = append(decodeTopics, hexutil.MustDecode(topics[0]))
+	decodeTopics = append(decodeTopics, hexutil.MustDecode(topics[1]))
 
 	tokenUnRegistry := &TokenUnRegisteredEvent{}
 	data := hexutil.MustDecode(input)
-	if err := TokenRegistryAbi.Unpack(tokenUnRegistry, "TokenUnregistered", data, [][]byte{}); err != nil {
+	if err := TokenRegistryAbi.Unpack(tokenUnRegistry, "TokenUnregistered", data, decodeTopics); err != nil {
 		t.Fatalf(err.Error())
 	}
 	t.Logf("TokenUnregistered symbol:%s, address:%s", tokenUnRegistry.Symbol, tokenUnRegistry.Token.Hex())
