@@ -171,6 +171,8 @@ func toGoType(index int, t Type, output []byte) (interface{}, error) {
 		returnOutput = output[index : index+32]
 	}
 
+	println("----ttttt", t.stringKind)
+
 	switch t.T {
 	case SliceTy:
 		return forEachUnpack(t, output, begin, end)
