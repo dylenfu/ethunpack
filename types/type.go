@@ -9,6 +9,7 @@ import (
 type Order struct {
 	Protocol              common.Address `json:"protocol" gencodec:"required"` // 智能合约地址
 	AuthAddr              common.Address `json:"authAddr" gencodec:"required"` //
+	WalletAddress         common.Address `json:"wallet_address"`
 	WalletId              *big.Int       `json:"walletId" gencodec:"required"`
 	TokenS                common.Address `json:"tokenS" gencodec:"required"`     // 卖出erc20代币智能合约地址
 	TokenB                common.Address `json:"tokenB" gencodec:"required"`     // 买入erc20代币智能合约地址
